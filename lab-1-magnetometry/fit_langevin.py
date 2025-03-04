@@ -10,8 +10,8 @@ plt.rcParams.update({
 })
 
 
-data_fname = 'aij-b-2-13-0-data'
-# data_fname = 'aij-b-2-13-1-data'
+# data_fname = 'aij-b-2-13-0-data'
+data_fname = 'aij-b-2-13-1-data'
 # data_fname = 'aij-a-2-13-0-data'
 
 data = np.loadtxt(f'./data/{data_fname}.txt', dtype=float, skiprows=12)
@@ -39,7 +39,7 @@ ax.plot(extrapolated_applied_field, fit_A * langevin(fit_B * extrapolated_applie
 
 ax.legend()
 ax.set_xlabel(r'Applied field $H$ (G)')
-ax.set_ylabel(r'Moment $M$ (emu)')
+ax.set_ylabel(r'Moment $\mu$ (emu)')
 ax.grid('on', linestyle='--', alpha=0.5)
 
 fig.set_size_inches(8,5)

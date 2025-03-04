@@ -29,7 +29,7 @@
 \usepackage{csquotes}
 \usepackage[capitalise]{cleveref}
 \usepackage{pgf,tikz,pgfplots, tikz-3dplot}
-\usepackage[labelfont=bf, width=.8\textwidth]{caption}
+\usepackage[labelfont=bf]{caption}
 \usepackage{subcaption}
 
 \renewcommand{\deg}{^\circ}
@@ -37,8 +37,8 @@
 \newenvironment{sketch}[1][{}]{
   \begin{tikzpicture}
     \begin{axis}[
-      width=6cm,
-      height=6cm,
+      width=4cm,
+      height=4cm,
       axis lines = middle,
       x label style = {at={(current axis.right of origin)}, anchor = west},
       y label style = {at={(current axis.above origin)}, anchor = south},
