@@ -9,7 +9,6 @@ plt.rcParams.update({
 	'font.size': 15,
 })
 
-
 # data_fname = 'aij-b-2-13-0-data'
 data_fname = 'aij-b-2-13-1-data'
 # data_fname = 'aij-a-2-13-0-data'
@@ -47,6 +46,3 @@ plt.tight_layout()
 
 fig.savefig(f'./data/{data_fname}-fit.pdf', format='pdf', bbox_inches='tight')
 plt.show()
-
-# print(data)
-# np.
