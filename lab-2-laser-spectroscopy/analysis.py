@@ -1,11 +1,14 @@
 import numpy as np
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
+from cycler import cycler
+colors = ['#4c72b0', '#55a868', '#c44e52', '#8172b3', '#937860', '#da8bc3', '#8c8c8c', '#ccb974', '#64b5cd']
 plt.rcParams.update({
   'text.usetex' : True,
   'font.family' : 'serif',
   'font.serif' : ['Computer Modern Serif'],
   'font.size': 15,
+  'axes.prop_cycle': cycler('color', colors)
 })
 
 
@@ -38,7 +41,7 @@ frequency_error = FSR * np.sqrt(K0_error**2 + K1_error**2 * time**2 + K2_error**
 
 # Initialize plot
 fig, ax = plt.subplots(1, 1, squeeze=True)
-ax.scatter(frequency, absorption, label='Data points')
+ax.scatter(frequency, absorption, label='Data points', marker='o')
 
 
 # Use Gaussians to fit the absorption peaks
@@ -49,9 +52,9 @@ def gaussian_fit(start, end):
   global is_first_call
 
   if is_first_call:
-    ax.scatter(frequency[start:end], absorption[start:end], color='red', label='Points used for fits')
+    ax.scatter(frequency[start:end], absorption[start:end], color=colors[1], marker='o', label='Points used for fits')
   else:
-    ax.scatter(frequency[start:end], absorption[start:end], color='red')
+    ax.scatter(frequency[start:end], absorption[start:end], color=colors[1], marker='o')
 
   fit_initial_parameters = [
     -1, # amplitude
@@ -61,16 +64,16 @@ def gaussian_fit(start, end):
   ]
   fit_parameters, _ = curve_fit(gaussian, frequency[start:end], absorption[start:end], p0=fit_initial_parameters)
   
-  plot_extra_points = 200
+  plot_extra_points = 300
   if is_first_call:
     ax.plot(frequency[start-plot_extra_points:end+plot_extra_points],
             gaussian(frequency[start-plot_extra_points:end+plot_extra_points], *fit_parameters),
-            color='black',
+            color=colors[2],
             label='Gaussian fits')
   else:
     ax.plot(frequency[start-plot_extra_points:end+plot_extra_points],
             gaussian(frequency[start-plot_extra_points:end+plot_extra_points], *fit_parameters),
-            color='black')
+            color=colors[2])
     
   is_first_call = False
 
@@ -135,7 +138,7 @@ ax.set_ylabel(r'Absorption')
 ax.set_yticks([])
 ax.grid('on', linestyle='--', alpha=0.5)
 
-fig.set_size_inches(8,5)
+fig.set_size_inches(12,6)
 plt.tight_layout()
 
 fig.savefig(f'./data/analysis.pdf', format='pdf', bbox_inches='tight')
