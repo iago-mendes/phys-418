@@ -120,9 +120,8 @@ print()
 
 
 # Find width of resonance curves
-# TODO: check how the width is defined for Doppler broadening
 def get_resonance_width(gaussian):
-  width = 2. * gaussian['std'] * 1e3 # in MHz
+  width = 2. * np.sqrt(2. * np.log(2)) * gaussian['std'] * 1e3 # in MHz
   return f'{width} MHz'
 print('Widths of resonance curves:')
 print(get_resonance_width(gaussian1))
