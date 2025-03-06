@@ -17,3 +17,5 @@ Subedi
 Ijiri
 paramagnetism
 Paramagnets
+hyperfine
+Fabry-Perot
