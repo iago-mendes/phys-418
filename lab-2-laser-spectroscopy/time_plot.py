@@ -11,7 +11,7 @@ plt.rcParams.update({
 })
 
 
-data_fname = './data/avay_iago11.txt'
+data_fname = './data/avay_iago12.txt'
 data = np.loadtxt(data_fname, dtype=float)
 time = data[:,0]
 absorption = data[:,1]
