@@ -1,8 +1,7 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{paper}[Paper]
 \LoadClass[
-  aps,prd,amsmath,floats,floatfix,twocolumn,
-  superscriptaddress,nofootinbib,showpacs
+  aps,prd,amsmath,floats,floatfix,twocolumn,nofootinbib,showpacs
 ]{revtex4-2}
 
 \usepackage[dvipsnames]{xcolor}
