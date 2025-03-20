@@ -62,7 +62,8 @@ def gaussian_fit(start, end):
     np.std(frequency[start:end]), # std
     np.max(absorption[start:end]) # offset
   ]
-  fit_parameters, _ = curve_fit(gaussian, frequency[start:end], absorption[start:end], p0=fit_initial_parameters)
+  fit_parameters, covariance_matrix = curve_fit(gaussian, frequency[start:end], absorption[start:end], p0=fit_initial_parameters)
+  fit_errors = np.sqrt(np.diag(covariance_matrix))
   
   plot_extra_points = 300
   if is_first_call:
@@ -82,6 +83,10 @@ def gaussian_fit(start, end):
     'center': fit_parameters[1],
     'std': fit_parameters[2],
     'offset': fit_parameters[3],
+    'amplitude_error': fit_errors[0],
+    'center_error': fit_errors[1],
+    'std_error': fit_errors[2],
+    'offset_error': fit_errors[3],
   }
 
 gaussian1 = gaussian_fit(438, 550)
@@ -122,7 +127,8 @@ print()
 # Find width of resonance curves
 def get_resonance_width(gaussian):
   width = 2. * np.sqrt(2. * np.log(2)) * gaussian['std'] * 1e3 # in MHz
-  return f'{width} MHz'
+  error = 2. * np.sqrt(2. * np.log(2)) * gaussian['std_error'] * 1e3 # in MHz
+  return f'{width} +- {error} MHz'
 print('Widths of resonance curves:')
 print(get_resonance_width(gaussian1))
 print(get_resonance_width(gaussian2))
@@ -132,7 +138,7 @@ print(get_resonance_width(gaussian4))
 
 # Edit and save plot
 ax.legend()
-ax.set_xlabel(r'$\nu + \nu_0$ (GHz)')
+ax.set_xlabel(r'$\nu - \nu_0$ (GHz)')
 ax.set_ylabel(r'Absorption')
 ax.set_yticks([])
 ax.grid('on', linestyle='--', alpha=0.5)
