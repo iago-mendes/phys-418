@@ -13,7 +13,7 @@ plt.rcParams.update({
 
 
 # Read data
-data_fname = './data/aij2025_03_13-13-35.txt'
+data_fname = './data/aij2025_03_18-14-19.txt'
 data = np.loadtxt(data_fname, dtype=float)
 timestamps = data[:,0]
 times = data[:,1]
@@ -97,7 +97,7 @@ def test_binning(num_bins, log = False):
 
   # Plot results
   if log:
-    ax.plot(bin_times, fit_counts, color=colors[1], label='Exponential decay fit')
+    ax.plot(bin_times, fit_counts, color=colors[1], label='Exponential decay fit', linewidth=3)
     
     ax.legend()
     ax.set_xlabel(r'Decay times (ns)')
@@ -118,7 +118,7 @@ def test_binning(num_bins, log = False):
 print('Optimizing binning...')
 best_num_bins = 0
 best_reduced_chi_squared = np.Infinity
-for num_bins in range(30, 100, 1):
+for num_bins in range(50, 500, 5):
   reduced_chi_squared = test_binning(num_bins)
   if abs(reduced_chi_squared-1.) < abs(best_reduced_chi_squared-1.):
     best_reduced_chi_squared = reduced_chi_squared
