@@ -13,7 +13,7 @@
 \date{\today}
 
 \begin{abstract}
-  Muons, produced by cosmic rays in the upper atmosphere, experience relativistic time dilation, which extends their lifetime and allows them to reach Earth's surface. In this experiment, we measured their lifetime by observing their decay in a plastic scintillator detector. By recording the muon decay times and fitting the data to an exponential decay model, we determined a charge-averaged lifetime of $\tau = 2.10(2) \ \mu s$, which lies within the literature values for the lifetime of positive and negative muons. From the measured lifetime, we estimated the reduced Fermi coupling constant, obtaining a value of $\bar G_F = 1.190(6) \times 10^{-5} \, \text{GeV}^{-2}$, which shows some disagreement with the literature value due to the charge-averaging nature of the experiment. These results provide valuable insights into how precise measurements advance our understanding of particle physics and the standard model.
+  Muons, produced by cosmic rays in the upper atmosphere, experience relativistic time dilation, which extends their lifetime and allows them to reach Earth's surface. In this experiment, we measured their lifetime by observing their decay in a plastic scintillator detector. By recording the muon decay times and fitting the data to an exponential decay model, we determined a charge-averaged lifetime of $\tau = 2.10(2) \ \mu s$, which lies within the literature values for the lifetime of positive and negative muons. From the measured lifetime, we estimated the reduced Fermi coupling constant, obtaining a value of $\bar G_F = 1.190(6) \times 10^{-5} \, \text{GeV}^{-2}$, which shows some expected disagreement with the literature value due to the charge-averaging nature of the experiment. These results provide valuable insights into how precise measurements advance our understanding of particle physics.
 \end{abstract}
 
 \maketitle
@@ -22,9 +22,9 @@
 
 Muons were first discovered in 1936 by Carl D. Anderson and Seth Neddermeyer while studying cosmic radiation \cite{Anderson1936}. They observed particles that curved differently from electrons and protons in a magnetic field, suggesting an intermediate mass. The existence of these particles was confirmed in the following year \cite{Street1937}.
 
-The role of muons in the study of the weak interaction was gradually established in the years after their discovery. Initially, muons were thought to be part of the meson family, which had been hypothesized by Yukawa to mediate the strong nuclear force \cite{Yukawa1935}. However, the work of Conversi, Piccioni, and Pancini revealed that muons decay in a manner inconsistent with strong interaction mediators \cite{Conversi1946}. Instead, it was found that muons decay via the weak interaction, much like electrons, but with a longer lifetime. This led to the realization that muons were leptons, not hadrons, and their behavior was governed by the weak force. The theoretical framework for weak interactions had been proposed earlier by Enrico Fermi in 1933 in the context of beta decay, introducing the Fermi coupling constant $G_F$ \cite{Fermi1933}.
+The role of muons in the study of the weak interaction was gradually established in the years after their discovery. Initially, muons were thought to be part of the meson family, which had been hypothesized by Yukawa to mediate the strong nuclear force \cite{Yukawa1935}. However, the work of Conversi, Piccioni, and Pancini revealed that muons decay in a manner inconsistent with strong interaction mediators \cite{Conversi1946}. Instead, it was found that muons decay via the weak interaction, like electrons, but with a longer lifetime. This led to the realization that muons were leptons and that their behavior was governed by the weak nuclear force. The theoretical framework for weak interactions had been proposed earlier by Enrico Fermi in 1933 in the context of beta decay, introducing the Fermi coupling constant $G_F$ \cite{Fermi1933}.
 
-In the modern era, muon lifetime measurements such as the one reported here remain important for testing the foundations of the Standard Model. Precise measurements of the muon lifetime allow for increasingly accurate determinations of $G_F$ \cite{Chitwood2007}. By reproducing one of the key results in particle physics history, this experiment provides an accessible way to explore the weak force and extract a fundamental physical constant from direct observation.
+In the modern era, muon lifetime measurements such as the one reported here remain important for testing the foundations of the Standard Model. Precise measurements of the muon lifetime allow for increasingly accurate determinations of $G_F$ \cite{Chitwood2007}. By reproducing one of the key results in particle physics history, the experiment in this report provides an accessible way to explore the weak force and extract a fundamental physical constant from direct observation.
 
 In this experiment, we used a plastic scintillator detector to measure the lifetime of muons. With this measurement, we estimated the Fermi coupling constant. In Section~\ref{sec:theory}, we provide an overview of muon decay and its connection to the Fermi coupling constant. Section~\ref{sec:methods} describes the working principles of the scintillator detector and our experimental procedures. Section~\ref{sec:results} presents our results and analysis. Finally, we conclude in Section~\ref{sec:conclusion} with a summary of our findings and possible areas of improvement.
 
@@ -50,7 +50,7 @@ or
 \begin{equation}\label{eq:muon+decay}
   \mu^+ \to e^+ + \nu_e + \bar\nu_\mu,
 \end{equation}
-respectively. By collecting the decay times of Eqs.~\eqref{eq:muon-decay}--\eqref{eq:muon+decay} inside the detector, we can examine the distribution of muon lifetimes inside the detector.
+respectively. Our goal in this experiment is to build a distribution of the decay times of Eqs.~\eqref{eq:muon-decay}--\eqref{eq:muon+decay} inside the detector.
 
 If we were to account for the time it takes for muons to travel from the upper atmosphere to our detector, we would get a distribution that follows an exponential decay of the form
 \begin{equation}\label{eq:exponential-decay}
@@ -133,14 +133,14 @@ and
 \begin{equation}\label{eq:tau-}
   \tau^- = 2.043(3) \ \mu s,
 \end{equation}
-respectively. Based on \cite{TeachSpinManual}, we know that we can find the ratio of the number of $\mu^+$ and the number of $\mu^-$ with
+respectively. Based on \cite{TeachSpinManual}, we know that we can find the ratio of the number of $\mu^+$ and the number of $\mu^-$ as
 \begin{align}
   \rho
   &= -\frac{\tau^+}{\tau^-} \left(\frac{\tau^- - \tau}{\tau^+ - \tau}\right) \\
   &= 0.6(4). \label{eq:ratio}
 \end{align}
 
-Note that the error in \eqref{eq:ratio} is very large. It was computed using the error propagation formula
+Note that the error in Eq.~\eqref{eq:ratio} is very large. It was computed using the error propagation formula
 \begin{equation}\label{eq:rho-error}
   \delta\rho = \frac{\tau^+}{\tau^-} \frac{(\tau^+ - \tau^-)}{(\tau^+ - \tau)^2} \delta\tau,
 \end{equation}
@@ -152,7 +152,7 @@ Using our experimental values, Eq.~\eqref{eq:rho-relative-error} becomes
 \begin{equation}\label{eq:rho-relative-error-numeric}
   \frac{\delta\rho}{\rho} = 58.5\ \frac{\delta\tau}{\tau}.
 \end{equation}
-This tells us that the error in $\tau$ gets significantly amplifies the error in $\rho$. Then, to get more accurate value of $\rho$, we need a much more accurate measurement of $\tau$.
+This tells us that the error in $\tau$ significantly amplifies the error in $\rho$. Then, to get a more accurate value of $\rho$, we need a much more accurate measurement of $\tau$.
 
 Let's now determine the Fermi coupling constant, which is related to the muon lifetime by Eq.~\eqref{eq:Fermi-constant}. In natural units, we define the reduced Fermi constant as
 \begin{equation}
@@ -166,7 +166,7 @@ where the uncertainty was calculated with
 \begin{equation}
   \frac{\delta \bar G_F}{\bar G_F} = \frac{1}{2} \frac{\delta \tau}{\tau}.
 \end{equation}
-Compared to the literature value, $1.1663 \times 10{-5} \ GeV^{-2}$ \cite{NIST_Fermi}, our measurement \eqref{eq:Fermi-constant-value} is significantly larger. This is expected since we found that our $\tau$ is smaller than the literature value due to the interaction of $\mu^-$ with matter.
+Compared to the literature value, $1.1663 \times 10{-5} \ GeV^{-2}$ \cite{NIST_Fermi}, our measurement in Eq.~\eqref{eq:Fermi-constant-value} is significantly larger. This is expected since we found that our $\tau$ is smaller than the literature value of $\mu^+$ due to the extra interaction of $\mu^-$ with matter.
 
 \section{Conclusion} \label{sec:conclusion}
 
