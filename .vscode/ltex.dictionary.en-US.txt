@@ -19,3 +19,4 @@ paramagnetism
 Paramagnets
 hyperfine
 Fabry-Perot
+photomultipler
