@@ -20,3 +20,5 @@ Paramagnets
 hyperfine
 Fabry-Perot
 photomultipler
+birefringent
+Molodtsova
