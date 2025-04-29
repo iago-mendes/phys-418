@@ -158,8 +158,8 @@ if __name__ == '__main__':
   alpha_grid, beta_grid = np.meshgrid(alpha_grid, beta_grid)
   A_fit, theta_l_fit, phi_m_fit, C_fit = fit_result.x
   N_analytic = expected_coincidences(alpha_grid, beta_grid, A_check, theta_l_check, 0, C_check)
-  N_fit = expected_coincidences(alpha_grid, beta_grid, A_fit, theta_l_fit, 0, C_fit)
-  N_corrected = expected_coincidences(alpha_grid, beta_grid, A_fit, 45, 0, C_fit)
+  N_fit = expected_coincidences(alpha_grid, beta_grid, A_fit, theta_l_fit, phi_m_fit, C_fit)
+  N_corrected = expected_coincidences(alpha_grid, beta_grid, A_fit, 45, phi_m_fit, C_fit)
   ax1.plot_surface(alpha_grid, beta_grid, N_analytic, cmap='coolwarm', alpha=0.6, label='Analytic check')
   ax2.plot_surface(alpha_grid, beta_grid, N_fit, cmap='coolwarm', alpha=0.6, label='Fit model')
   ax3.plot_surface(alpha_grid, beta_grid, N_corrected, cmap='coolwarm', alpha=0.6, label='Corrected model')
