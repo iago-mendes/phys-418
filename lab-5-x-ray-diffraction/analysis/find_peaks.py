@@ -1,68 +1,123 @@
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
-from scipy.signal import find_peaks
-from lmfit.models import VoigtModel
+from scipy.signal import find_peaks as scipy_find_peaks
+from lmfit.models import VoigtModel, GaussianModel, LorentzianModel
+from cycler import cycler
+import warnings
+warnings.filterwarnings("ignore", message="Using UFloat objects with std_dev==0")
+colors = ['#4c72b0', '#c44e52', '#55a868', '#8172b3', '#937860', '#da8bc3', '#8c8c8c', '#ccb974', '#64b5cd']
+plt.rcParams.update({
+'text.usetex' : True,
+'font.family' : 'serif',
+'font.serif' : ['Computer Modern Serif'],
+'font.size': 15,
+'axes.prop_cycle': cycler('color', colors)
+})
 
-# Load data
-df = pd.read_csv("../data/polycrystaline-7.TXT", sep="\t", header=None, names=["2theta", "intensity"])
-x = df["2theta"].values
-y = df["intensity"].values
+K_ALPHA_1_WAVELENGTH = 1.54056
+K_ALPHA_2_WAVELENGTH = 1.54439
 
-# Find peak positions
-peaks, _ = find_peaks(y, height=200, distance=100)  # tune height/distance as needed
-peak_positions = x[peaks]
-print(peak_positions, len(peak_positions))
+def find_peaks(data_fname, plot_fname, min_height=200, min_distance=100, xlim=None):
+  print(f'Finding peaks in {data_fname}')
 
-# Constants for Cu Kα lines (in Å), to compute angular separation
-lambda1 = 1.5406  # Kα1
-lambda2 = 1.5444  # Kα2
+  # Load data
+  data = np.loadtxt(data_fname, dtype=float)
+  two_theta = data[:, 0]
+  intensity = data[:, 1]
 
-def delta_2theta(theta_deg):
-    """Return angular separation between Kα1 and Kα2 in degrees at a given theta."""
-    theta_rad = np.radians(theta_deg / 2)
-    d_spacing = lambda1 / (2 * np.sin(theta_rad))
-    theta2 = np.degrees(2 * np.arcsin(lambda2 / (2 * d_spacing)))
-    return theta2 - theta_deg
+  # Ignore background counts
+  mask = two_theta >= 20
+  two_theta = two_theta[mask]
+  intensity = intensity[mask]
 
-# Create the composite model
-model = None
-params = None
+  # Find peak positions
+  peaks_data_indices, _ = scipy_find_peaks(intensity, height=min_height, distance=min_distance)
+  peak_positions = two_theta[peaks_data_indices]
+  print(f'\tFound {len(peak_positions)} peaks: {peak_positions}')
 
-for i, pos in enumerate(peak_positions):
-    prefix1 = f"p{i}_ka1_"
-    prefix2 = f"p{i}_ka2_"
+  # Create the composite model
+  composite_model = None
+  composite_params = None
+  for peak_number, data_index in enumerate(peaks_data_indices):
+    prefix1 = f"p{peak_number}_ka1_"
+    prefix2 = f"p{peak_number}_ka2_"
+
+    peak1_two_theta = two_theta[data_index]
+    peak1_intensity = intensity[data_index]
+    # print(f"\tPeak {peak_number}: {peak1_two_theta:.2f} ({peak1_intensity:.2f})")
     
-    # Kα1 peak
-    m1 = VoigtModel(prefix=prefix1)
-    p1 = m1.make_params(center=pos, amplitude=1000, sigma=0.05)
+    # K alpha 1 peak
+    model1 = VoigtModel(prefix=prefix1)
+    params1 = model1.make_params(center=peak1_two_theta, amplitude=peak1_intensity, sigma=0.005)
 
-    # Kα2 peak (shifted and half intensity)
-    shift = delta_2theta(pos)
-    m2 = VoigtModel(prefix=prefix2)
-    p2 = m2.make_params(center=pos + shift, amplitude=500, sigma=0.05)
+    # Constrain K alpha 1 peak to detected region
+    params1[prefix1 + "center"].set(min=peak1_two_theta - 0.5, max=peak1_two_theta + 0.5)
+    params1[prefix1 + "amplitude"].set(value=peak1_intensity, min=peak1_intensity * 0.1, max=peak1_intensity * 2.)
+    # params1[prefix1 + "amplitude"].set(value=peak1_intensity, vary=False)
 
-    # Fix relationship
-    p2[prefix2+"amplitude"].set(expr=f"{prefix1}amplitude * 0.5")
-    p2[prefix2+"sigma"].set(expr=f"{prefix1}sigma")
-    p2[prefix2+"center"].set(expr=f"{prefix1}center + {shift:.6f}")
+    # Estimate location of K alpha 2 peak
+    d_spacing = K_ALPHA_1_WAVELENGTH / (2 * np.sin(np.radians(peak1_two_theta / 2)))
+    peak2_two_theta = 2. * np.degrees(np.arcsin(K_ALPHA_2_WAVELENGTH / (2 * d_spacing)))
+    splitting = peak2_two_theta - peak1_two_theta
+    peak2_intensity = peak1_intensity * 0.5
+    
+    # K alpha 2 peak
+    model2 = VoigtModel(prefix=prefix2)
+    params2 = model2.make_params(center=peak2_two_theta, amplitude=peak2_intensity, sigma=0.05)
 
-    # Add to global model
-    if model is None:
-        model = m1 + m2
-        params = p1 + p2
+    # Enforce relationship between K alpha 1 and K alpha 2 peaks
+    params2[prefix2+"amplitude"].set(expr=f"{prefix1}amplitude * 0.5")
+    params2[prefix2+"sigma"].set(expr=f"{prefix1}sigma")
+    params2[prefix2+"center"].set(expr=f"{prefix1}center + {splitting}")
+
+    # Add to composite model
+    if composite_model is None:
+        composite_model = model1 + model2
+        composite_params = params1 + params2
     else:
-        model += m1 + m2
-        params.update(p1)
-        params.update(p2)
+        composite_model += model1 + model2
+        composite_params.update(params1)
+        composite_params.update(params2)
 
-# Fit and plot
-result = model.fit(y, params, x=x)
-result.plot_fit()
-plt.title("Fitted XRD Peaks with Kα1 and Kα2 Doublets")
-plt.xlabel("2θ (degrees)")
-plt.ylabel("Intensity")
-plt.show()
+  if len(peaks_data_indices) > 0:
+    fit_result = composite_model.fit(
+      intensity, 
+      composite_params,
+      x=two_theta,
+      max_nfev=1000,
+      iter_cb=lambda p, i, r, *a, **k: print(f"\tIteration {i:04}: residual norm = {np.linalg.norm(r):.2f}") if i % 100 == 0 else None
+    )
 
-# Print fit report
-print(result.fit_report())
+  fig, ax = plt.subplots(1, 1, squeeze=True)
+  ax.scatter(two_theta, intensity, label='Data', color='black')
+  if len(peaks_data_indices) > 0:
+    ax.plot(two_theta, fit_result.best_fit, label='Fit', color='red')
+  ax.set_xlabel(r'$2\theta \ (^\circ)$')
+  ax.set_ylabel("Counts")
+  ax.legend()
+
+  if xlim is not None:
+    ax.set_xlim(xlim)
+    visible_y = intensity[(two_theta >= xlim[0]) & (two_theta <= xlim[1])]
+    ax.set_ylim(0, visible_y.max() * 1.2)
+
+  for peak_number in range(len(peaks_data_indices)):
+      peak_two_theta = two_theta[peaks_data_indices[peak_number]]
+      if xlim and (peak_two_theta < xlim[0] or peak_two_theta > xlim[1]):
+          continue
+      center = fit_result.params[f"p{peak_number}_ka1_center"].value
+      ax.axvline(center, color='gray', linestyle='--', linewidth=1)
+      ax.text(center, ax.get_ylim()[1] * 0.98, f"{center:.2f}", 
+              rotation=90, ha='right', va='top', color='gray')
+  
+  fig.set_size_inches(8,6)
+  plt.tight_layout()
+  fig.savefig(plot_fname, format='pdf', bbox_inches='tight')
+  plt.show()
+
+
+# find_peaks('../data/polycrystaline-6.TXT', 'peaks-Si_polycrystalline-1st_peak.pdf', xlim=(28.2,28.8))
+# find_peaks('../data/polycrystaline-7.TXT', 'peaks-Si_polycrystalline.pdf', xlim=(45,100))
+# find_peaks('../data/single-std3.txt', 'peaks-Si_single_crystal-std.pdf', xlim=(65, 73.5))
+# find_peaks('../data/single-510-1.TXT', 'peaks-Si_single_crystal-510.pdf')
+find_peaks('../data/super-7.TXT', 'peaks-superconductor-M4.pdf', min_height=75, min_distance=20)
