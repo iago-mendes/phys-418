@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks as scipy_find_peaks
-from lmfit.models import VoigtModel, GaussianModel, LorentzianModel
+from lmfit.models import VoigtModel
 from cycler import cycler
 import warnings
 warnings.filterwarnings("ignore", message="Using UFloat objects with std_dev==0")
@@ -14,10 +14,10 @@ plt.rcParams.update({
 'axes.prop_cycle': cycler('color', colors)
 })
 
-K_ALPHA_1_WAVELENGTH = 1.54056
-K_ALPHA_2_WAVELENGTH = 1.54439
+K_ALPHA_1_WAVELENGTH = 1.54051
+K_ALPHA_2_WAVELENGTH = 1.54433
 
-def find_peaks(data_fname, plot_fname, min_height=200, min_distance=100, xlim=None):
+def find_peaks(data_fname, plot_fname, min_height=200, min_distance=100, xlim=None, peak_labels=None):
   print(f'Finding peaks in {data_fname}')
 
   # Load data
@@ -33,7 +33,7 @@ def find_peaks(data_fname, plot_fname, min_height=200, min_distance=100, xlim=No
   # Find peak positions
   peaks_data_indices, _ = scipy_find_peaks(intensity, height=min_height, distance=min_distance)
   peak_positions = two_theta[peaks_data_indices]
-  print(f'\tFound {len(peak_positions)} peaks: {peak_positions}')
+  print(f'\tFound {len(peak_positions)} peaks')
 
   # Create the composite model
   composite_model = None
@@ -85,8 +85,12 @@ def find_peaks(data_fname, plot_fname, min_height=200, min_distance=100, xlim=No
       composite_params,
       x=two_theta,
       max_nfev=1000,
-      iter_cb=lambda p, i, r, *a, **k: print(f"\tIteration {i:04}: residual norm = {np.linalg.norm(r):.2f}") if i % 100 == 0 else None
+      # iter_cb=lambda p, i, r, *a, **k: print(f"\tIteration {i:04}: residual norm = {np.linalg.norm(r):.2f}") if i % 10 == 0 else None
     )
+    peaks = []
+    for peak_number in range(len(peaks_data_indices)):
+      peaks.append(fit_result.params[f"p{peak_number}_ka1_center"].value)
+    print(f"\tFitted peaks: {peaks}")
 
   fig, ax = plt.subplots(1, 1, squeeze=True)
   ax.scatter(two_theta, intensity, label='Data', color='black')
@@ -99,25 +103,39 @@ def find_peaks(data_fname, plot_fname, min_height=200, min_distance=100, xlim=No
   if xlim is not None:
     ax.set_xlim(xlim)
     visible_y = intensity[(two_theta >= xlim[0]) & (two_theta <= xlim[1])]
-    ax.set_ylim(0, visible_y.max() * 1.2)
+    ax.set_ylim(-100, visible_y.max() * 1.2)
 
-  for peak_number in range(len(peaks_data_indices)):
-      peak_two_theta = two_theta[peaks_data_indices[peak_number]]
-      if xlim and (peak_two_theta < xlim[0] or peak_two_theta > xlim[1]):
-          continue
-      center = fit_result.params[f"p{peak_number}_ka1_center"].value
-      ax.axvline(center, color='gray', linestyle='--', linewidth=1)
-      ax.text(center, ax.get_ylim()[1] * 0.98, f"{center:.2f}", 
-              rotation=90, ha='right', va='top', color='gray')
+  if peak_labels is not None:
+    for peak_number in range(len(peaks_data_indices)):
+        peak_two_theta = two_theta[peaks_data_indices[peak_number]]
+        if xlim and (peak_two_theta < xlim[0] or peak_two_theta > xlim[1]):
+            continue
+        center = fit_result.params[f"p{peak_number}_ka1_center"].value
+        ax.axvline(center, color='gray', linestyle='--', linewidth=1)
+        ax.text(center, ax.get_ylim()[1] * 0.98, peak_labels[peak_number], 
+                rotation=0, ha='right', va='top', color='gray')
   
-  fig.set_size_inches(8,6)
+  fig.set_size_inches(8,4)
   plt.tight_layout()
   fig.savefig(plot_fname, format='pdf', bbox_inches='tight')
   plt.show()
 
 
-# find_peaks('../data/polycrystaline-6.TXT', 'peaks-Si_polycrystalline-1st_peak.pdf', xlim=(28.2,28.8))
-# find_peaks('../data/polycrystaline-7.TXT', 'peaks-Si_polycrystalline.pdf', xlim=(45,100))
-# find_peaks('../data/single-std3.txt', 'peaks-Si_single_crystal-std.pdf', xlim=(65, 73.5))
-# find_peaks('../data/single-510-1.TXT', 'peaks-Si_single_crystal-510.pdf')
-find_peaks('../data/super-7.TXT', 'peaks-superconductor-M4.pdf', min_height=75, min_distance=20)
+find_peaks(
+  '../data/polycrystaline-6.TXT',
+  'peaks-Si_polycrystalline-1st_peak.pdf',
+  xlim=(28.2,28.8),
+  peak_labels=['(111)']
+)
+find_peaks(
+  '../data/polycrystaline-7.TXT',
+  'peaks-Si_polycrystalline.pdf',
+  peak_labels=['(111)', '(220)', '(311)', '(400)', '(331)', '(422)', '(511)']
+)
+find_peaks(
+  '../data/single-std3.txt',
+  'peaks-Si_single_crystal-std.pdf',
+  xlim=(65, 73.5),
+  peak_labels=['(400)']
+)
+find_peaks('../data/single-510-1.TXT', 'peaks-Si_single_crystal-510.pdf')

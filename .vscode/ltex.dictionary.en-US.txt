@@ -23,3 +23,6 @@ photomultipler
 birefringent
 Molodtsova
 Einstein-Podolsky-Rosen
+polycrystalline
+interplanar
+diffractometer
